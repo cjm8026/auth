@@ -41,11 +41,20 @@ export async function authMiddleware(
     } catch (error) {
       if (error instanceof UserNotFoundError) {
         console.log(`[authMiddleware] Creating new user in DB: ${decodedToken.sub}`);
-        await userService.createUser(
-          decodedToken.sub,
-          decodedToken.email,
-          decodedToken.preferred_username || decodedToken.email
-        );
+        try {
+          await userService.createUser(
+            decodedToken.sub,
+            decodedToken.email,
+            decodedToken.preferred_username || decodedToken.email
+          );
+        } catch (createError: any) {
+          // 이메일 중복 에러는 무시 (이미 같은 이메일로 가입된 경우)
+          if (createError.code === '23505') {
+            console.log(`[authMiddleware] User with email ${decodedToken.email} already exists, skipping creation`);
+          } else {
+            throw createError;
+          }
+        }
       } else {
         throw error;
       }
