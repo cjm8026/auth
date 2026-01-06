@@ -173,6 +173,10 @@ export class DatabaseService {
 }
 
 export function createDatabaseConfig(): DatabaseConfig {
+  // Debug: Log password length (not the actual password)
+  console.log('[DB Config] DB_PASSWORD length:', process.env.DB_PASSWORD?.length || 0);
+  console.log('[DB Config] DB_PASSWORD first char:', process.env.DB_PASSWORD?.charAt(0) || 'empty');
+  
   const config: DatabaseConfig = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432', 10),
