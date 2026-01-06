@@ -167,8 +167,8 @@ jobs:
     name: Setup EventBridge Warm-up
     runs-on: ubuntu-latest
     needs: deploy-lambda
-    # Lambda 함수가 존재할 때만 실행
-    if: true  # fproject-dev-db-query 함수 사용
+    # EventBridge를 수동으로 설정하려면 이 단계를 스킵
+    if: false  # 콘솔에서 수동 설정 시 false로 유지
     
     steps:
       - name: Checkout code
