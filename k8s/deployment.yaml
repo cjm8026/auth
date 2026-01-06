@@ -88,6 +88,11 @@ spec:
             configMapKeyRef:
               name: fproject-backend-config
               key: NODE_ENV
+        - name: S3_BUCKET
+          valueFrom:
+            configMapKeyRef:
+              name: fproject-backend-config
+              key: S3_BUCKET
         # Secret values
         - name: DB_PASSWORD
           valueFrom:

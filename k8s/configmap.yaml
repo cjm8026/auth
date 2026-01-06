@@ -17,6 +17,7 @@ data:
   AWS_REGION: "us-east-1"
   AWS_USER_POOL_ID: "us-east-1_oesTGe9D5"
   AWS_CLIENT_ID: "6ugujl077j6fmcqgptjmn91b7e"
+  S3_BUCKET: "knowledge-base-test-6575574"
   
   # API Configuration
   API_PORT: "3001"

@@ -3,6 +3,7 @@
  */
 
 import { getDatabaseService } from './database';
+import { getS3Service } from './s3Service';
 import { isValidNickname, isValidPhoneNumber, keysToCamelCase } from './databaseUtils';
 import type { FullUserProfile, UpdateUserProfileData } from '../types/database';
 
@@ -228,6 +229,73 @@ export class UserService {
       'UPDATE users SET updated_at = CURRENT_TIMESTAMP WHERE user_id = $1',
       [userId]
     );
+  }
+
+  /**
+   * Upload profile image and update DB
+   */
+  async uploadProfileImage(
+    userId: string,
+    fileBuffer: Buffer,
+    mimeType: string,
+    originalName: string
+  ): Promise<{ imageUrl: string; profile: FullUserProfile }> {
+    const db = getDatabaseService();
+    const s3Service = getS3Service();
+
+    // Get current profile to check for existing image
+    const currentProfile = await this.getUserProfile(userId);
+    
+    // Delete old image if exists
+    if (currentProfile.profileImageUrl) {
+      await s3Service.deleteProfileImage(currentProfile.profileImageUrl);
+    }
+
+    // Upload new image to S3
+    const imageUrl = await s3Service.uploadProfileImage(
+      userId,
+      fileBuffer,
+      mimeType,
+      originalName
+    );
+
+    // Update DB with new image URL
+    await db.query(
+      'UPDATE user_profiles SET profile_image_url = $1, updated_at = CURRENT_TIMESTAMP WHERE user_id = $2',
+      [imageUrl, userId]
+    );
+
+    // Return updated profile
+    const updatedProfile = await this.getUserProfile(userId);
+    
+    return {
+      imageUrl,
+      profile: updatedProfile,
+    };
+  }
+
+  /**
+   * Delete profile image
+   */
+  async deleteProfileImage(userId: string): Promise<FullUserProfile> {
+    const db = getDatabaseService();
+    const s3Service = getS3Service();
+
+    // Get current profile
+    const currentProfile = await this.getUserProfile(userId);
+    
+    // Delete from S3 if exists
+    if (currentProfile.profileImageUrl) {
+      await s3Service.deleteProfileImage(currentProfile.profileImageUrl);
+    }
+
+    // Update DB
+    await db.query(
+      'UPDATE user_profiles SET profile_image_url = NULL, updated_at = CURRENT_TIMESTAMP WHERE user_id = $1',
+      [userId]
+    );
+
+    return await this.getUserProfile(userId);
   }
 }
 

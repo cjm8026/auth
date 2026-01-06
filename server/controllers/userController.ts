@@ -253,3 +253,71 @@ export async function getUserInquiries(
     data: inquiries,
   });
 }
+
+export async function uploadProfileImage(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
+  const userId = req.user!.userId;
+  const file = req.file;
+
+  if (!file) {
+    res.status(400).json({
+      error: 'ValidationError',
+      message: 'No image file provided',
+    });
+    return;
+  }
+
+  // Validate file type
+  const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+  if (!allowedTypes.includes(file.mimetype)) {
+    res.status(400).json({
+      error: 'ValidationError',
+      message: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP',
+    });
+    return;
+  }
+
+  // Validate file size (max 5MB)
+  const maxSize = 5 * 1024 * 1024;
+  if (file.size > maxSize) {
+    res.status(400).json({
+      error: 'ValidationError',
+      message: 'File too large. Maximum size is 5MB',
+    });
+    return;
+  }
+
+  const userService = getUserService();
+  const result = await userService.uploadProfileImage(
+    userId,
+    file.buffer,
+    file.mimetype,
+    file.originalname
+  );
+
+  res.json({
+    success: true,
+    data: {
+      imageUrl: result.imageUrl,
+      profile: result.profile,
+    },
+    message: 'Profile image uploaded successfully',
+  });
+}
+
+export async function deleteProfileImage(
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<void> {
+  const userId = req.user!.userId;
+  const userService = getUserService();
+  const profile = await userService.deleteProfileImage(userId);
+
+  res.json({
+    success: true,
+    data: profile,
+    message: 'Profile image deleted successfully',
+  });
+}
