@@ -57,6 +57,10 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
         run: |
+          # Debug: Check if secrets are set (show length only, not value)
+          echo "DB_PASSWORD length: ${#DB_PASSWORD}"
+          echo "GOOGLE_CLIENT_SECRET length: ${#GOOGLE_CLIENT_SECRET}"
+          
           # Use kubectl apply with --force to replace existing secret
           kubectl create secret generic fproject-backend-secret \
             --from-literal=DB_PASSWORD="$DB_PASSWORD" \
@@ -66,6 +70,9 @@ jobs:
           # Verify secret was created/updated
           echo "Secret created/updated successfully"
           kubectl get secret fproject-backend-secret
+          
+          # Restart deployment to pick up new secret
+          kubectl rollout restart deployment/fproject-backend
       
       - name: Deploy to Kubernetes
         run: |
