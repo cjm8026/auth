@@ -99,6 +99,8 @@ jobs:
     name: Deploy Lambda Function
     runs-on: ubuntu-latest
     needs: deploy-kubernetes
+    # Lambda 함수가 존재할 때만 실행
+    if: false  # Lambda 함수 생성 후 true로 변경하세요
     
     steps:
       - name: Checkout code
@@ -165,6 +167,8 @@ jobs:
     name: Setup EventBridge Warm-up
     runs-on: ubuntu-latest
     needs: deploy-lambda
+    # Lambda 함수가 존재할 때만 실행
+    if: false  # Lambda 함수 생성 후 true로 변경하세요
     
     steps:
       - name: Checkout code
@@ -227,5 +231,10 @@ jobs:
           echo "Author: ${{ github.actor }}"
           echo ""
           echo "✅ Kubernetes: ${{ needs.deploy-kubernetes.result }}"
-          echo "✅ Lambda: ${{ needs.deploy-lambda.result }}"
-          echo "✅ EventBridge: ${{ needs.setup-lambda-warmup.result }}"
+          if [[ "${{ needs.deploy-lambda.result }}" != "skipped" ]]; then
+            echo "✅ Lambda: ${{ needs.deploy-lambda.result }}"
+            echo "✅ EventBridge: ${{ needs.setup-lambda-warmup.result }}"
+          else
+            echo "⏭️  Lambda: Skipped (함수가 아직 생성되지 않음)"
+            echo "⏭️  EventBridge: Skipped"
+          fi
