@@ -1,25 +1,28 @@
-apiVersion: v1
-kind: ConfigMap
+# ConfigMap: 비민감한 설정 데이터를 저장하는 리소스
+# Git에 커밋 가능, 환경변수로 Pod에 주입됨
+apiVersion: v1       # Kubernetes API 버전
+kind: ConfigMap      # 리소스 타입
 metadata:
-  name: fproject-backend-config
-  namespace: default
+  name: fproject-backend-config  # ConfigMap 이름 (Deployment에서 참조)
+  namespace: default             # 배포할 네임스페이스
 data:
-  # Database Configuration
-  DB_HOST: "fproject-dev-postgres.c9eksq6cmh3c.us-east-1.rds.amazonaws.com"
-  DB_PORT: "5432"
-  DB_NAME: "fproject_db"
-  DB_USER: "fproject_user"
-  DB_MAX_CONNECTIONS: "20"
-  DB_IDLE_TIMEOUT: "30000"
-  DB_CONNECTION_TIMEOUT: "5000"
+  # ===== 데이터베이스 설정 =====
+  DB_HOST: "fproject-dev-postgres.c9eksq6cmh3c.us-east-1.rds.amazonaws.com"  # RDS 엔드포인트
+  DB_PORT: "5432"                      # PostgreSQL 기본 포트
+  DB_NAME: "fproject_db"               # 데이터베이스 이름
+  DB_USER: "fproject_user"             # 데이터베이스 사용자명
+  DB_MAX_CONNECTIONS: "20"             # Connection Pool 최대 연결 수 (Pod 2개 × 10)
+  DB_IDLE_TIMEOUT: "30000"             # 유휴 연결 타임아웃 (30초, 밀리초 단위)
+  DB_CONNECTION_TIMEOUT: "5000"        # 연결 시도 타임아웃 (5초, 밀리초 단위)
   
-  # AWS Configuration
-  AWS_REGION: "us-east-1"
-  AWS_USER_POOL_ID: "us-east-1_oesTGe9D5"
-  AWS_CLIENT_ID: "6ugujl077j6fmcqgptjmn91b7e"
-  S3_BUCKET: "knowledge-base-test-6575574"
+  # ===== AWS 서비스 설정 =====
+  AWS_REGION: "us-east-1"              # AWS 리전
+  AWS_USER_POOL_ID: "us-east-1_oesTGe9D5"           # Cognito User Pool ID (인증용)
+  AWS_CLIENT_ID: "6ugujl077j6fmcqgptjmn91b7e"       # Cognito Client ID (인증용)
+  S3_BUCKET: "knowledge-base-test-6575574"          # 프로필 이미지 업로드용 S3 버킷
   
-  # API Configuration
-  API_PORT: "3001"
-  FRONTEND_URL: "https://www.aws11.shop"
-  NODE_ENV: "production"
+  # ===== API 서버 설정 =====
+  API_PORT: "3001"                     # Express 서버가 리스닝할 포트
+  FRONTEND_URL: "https://www.aws11.shop"  # CORS 허용 도메인 (프론트엔드 URL)
+  NODE_ENV: "production"               # Node.js 환경 (production/development)
+                                       # production: 에러 스택 숨김, 로깅 최소화, 성능 최적화

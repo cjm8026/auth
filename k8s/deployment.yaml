@@ -1,34 +1,40 @@
-apiVersion: apps/v1
-kind: Deployment
+# Deployment: Pod를 생성하고 관리하는 리소스
+apiVersion: apps/v1  # Kubernetes API 버전
+kind: Deployment     # 리소스 타입
 metadata:
-  name: fproject-backend
-  namespace: default
+  name: fproject-backend      # Deployment 이름
+  namespace: default          # 배포할 네임스페이스
   labels:
-    app: fproject-backend
+    app: fproject-backend     # Deployment에 붙는 레이블 (관리용)
 spec:
-  replicas: 2
+  replicas: 2                 # 실행할 Pod 개수 (고가용성을 위해 2개)
   selector:
     matchLabels:
-      app: fproject-backend
-  template:
+      app: fproject-backend   # 이 레이블을 가진 Pod를 관리
+  template:                   # Pod 템플릿 (실제 생성될 Pod의 설정)
     metadata:
       labels:
-        app: fproject-backend
+        app: fproject-backend # Pod에 붙는 레이블 (Service가 이걸로 찾음)
     spec:
-      serviceAccountName: fproject-backend-sa
+      serviceAccountName: fproject-backend-sa  # IAM Role 연동을 위한 ServiceAccount
       containers:
-      - name: backend
-        image: 324547056370.dkr.ecr.us-east-1.amazonaws.com/fproject-dev-api:latest
+      - name: backend                          # 컨테이너 이름
+        image: 324547056370.dkr.ecr.us-east-1.amazonaws.com/fproject-dev-api:latest  # ECR 이미지 경로
         ports:
-        - containerPort: 3001
-          name: http
+        - containerPort: 3001  # 컨테이너가 리스닝하는 포트 (Express 서버 포트)
+          name: http           # 포트 이름 (Service에서 참조 가능)
+        # ===== 볼륨 마운트 추가 (CSI Driver가 Secret을 생성하도록 트리거) =====
+        volumeMounts:
+        - name: secrets-store-inline  # 볼륨 이름
+          mountPath: "/mnt/secrets-store"  # 마운트 경로 (실제로 사용하지 않지만 필요)
+          readOnly: true
         env:
-        # ConfigMap values
-        - name: DB_HOST
+        # ===== ConfigMap에서 가져오는 환경변수 (비민감 정보) =====
+        - name: DB_HOST        # 환경변수 이름
           valueFrom:
             configMapKeyRef:
-              name: fproject-backend-config
-              key: DB_HOST
+              name: fproject-backend-config  # ConfigMap 이름
+              key: DB_HOST                   # ConfigMap의 키
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
@@ -44,98 +50,104 @@ spec:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_USER
-        - name: DB_MAX_CONNECTIONS
+        - name: DB_MAX_CONNECTIONS  # Connection Pool 최대 연결 수
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_MAX_CONNECTIONS
-        - name: DB_IDLE_TIMEOUT
+        - name: DB_IDLE_TIMEOUT     # 유휴 연결 타임아웃 (밀리초)
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_IDLE_TIMEOUT
-        - name: DB_CONNECTION_TIMEOUT
+        - name: DB_CONNECTION_TIMEOUT  # 연결 시도 타임아웃 (밀리초)
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_CONNECTION_TIMEOUT
-        - name: AWS_REGION
+        - name: AWS_REGION          # AWS 리전
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_REGION
-        - name: AWS_USER_POOL_ID
+        - name: AWS_USER_POOL_ID    # Cognito User Pool ID
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_USER_POOL_ID
-        - name: AWS_CLIENT_ID
+        - name: AWS_CLIENT_ID       # Cognito Client ID
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_CLIENT_ID
-        - name: API_PORT
+        - name: API_PORT            # API 서버 포트
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: API_PORT
-        - name: FRONTEND_URL
+        - name: FRONTEND_URL        # CORS 설정용 프론트엔드 URL
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: FRONTEND_URL
-        - name: NODE_ENV
+        - name: NODE_ENV            # Node.js 환경 (production/development)
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: NODE_ENV
-        - name: S3_BUCKET
+        - name: S3_BUCKET           # 프로필 이미지 업로드용 S3 버킷
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: S3_BUCKET
-        # Secret values
-        - name: DB_PASSWORD
+        # ===== Secret에서 가져오는 환경변수 (민감 정보) =====
+        - name: DB_PASSWORD         # 데이터베이스 비밀번호
           valueFrom:
             secretKeyRef:
-              name: fproject-backend-secret
-              key: DB_PASSWORD
-        - name: GOOGLE_CLIENT_SECRET
-          valueFrom:
-            secretKeyRef:
-              name: fproject-backend-secret
-              key: GOOGLE_CLIENT_SECRET
-        - name: AWS_ACCESS_KEY_ID
+              name: fproject-backend-secret  # Secret 이름
+              key: DB_PASSWORD               # Secret의 키
+        - name: AWS_ACCESS_KEY_ID     # AWS 액세스 키 ID
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
               key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY
+        - name: AWS_SECRET_ACCESS_KEY # AWS 시크릿 액세스 키
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
               key: AWS_SECRET_ACCESS_KEY
+        # ===== 리소스 제한 =====
         resources:
-          requests:
-            memory: "256Mi"
-            cpu: "250m"
-          limits:
-            memory: "512Mi"
-            cpu: "500m"
+          requests:              # 최소 보장 리소스 (스케줄링 시 고려)
+            memory: "256Mi"      # 최소 256MB 메모리 보장
+            cpu: "250m"          # 최소 0.25 CPU 코어 보장 (1000m = 1 core)
+          limits:                # 최대 사용 가능 리소스
+            memory: "512Mi"      # 최대 512MB (초과 시 OOMKilled)
+            cpu: "500m"          # 최대 0.5 CPU 코어 (초과 시 throttling)
+        # ===== Liveness Probe: Pod가 살아있는지 체크 (실패 시 재시작) =====
         livenessProbe:
           httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 30
-          periodSeconds: 10
-          timeoutSeconds: 5
-          failureThreshold: 3
+            path: /health        # 체크할 HTTP 경로
+            port: 3001           # 체크할 포트
+          initialDelaySeconds: 30  # Pod 시작 후 30초 대기 (앱 초기화 시간)
+          periodSeconds: 10        # 10초마다 체크
+          timeoutSeconds: 5        # 5초 안에 응답 없으면 실패
+          failureThreshold: 3      # 3번 연속 실패하면 Pod 재시작
+        # ===== Readiness Probe: Pod가 트래픽 받을 준비가 됐는지 체크 (실패 시 Service에서 제외) =====
         readinessProbe:
           httpGet:
-            path: /health
-            port: 3001
-          initialDelaySeconds: 5
-          periodSeconds: 5
-          timeoutSeconds: 3
-          failureThreshold: 3
-      restartPolicy: Always
+            path: /health        # 체크할 HTTP 경로
+            port: 3001           # 체크할 포트
+          initialDelaySeconds: 5   # Pod 시작 후 5초 대기
+          periodSeconds: 5         # 5초마다 체크
+          timeoutSeconds: 3        # 3초 안에 응답 없으면 실패
+          failureThreshold: 3      # 3번 연속 실패하면 Service에서 제외
+      restartPolicy: Always      # Pod 종료 시 항상 재시작
+      # ===== 볼륨 정의 (CSI Driver 사용) =====
+      volumes:
+      - name: secrets-store-inline
+        csi:
+          driver: secrets-store.csi.k8s.io  # CSI Driver 이름
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: "fproject-backend-secrets"  # SecretProviderClass 이름
