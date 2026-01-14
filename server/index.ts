@@ -53,7 +53,7 @@ app.get('/auth/health', (req: Request, res: Response) => {
 });
 
 // API routes
-app.use('/auth/api/user', userRoutes);
+app.use('/auth/user', userRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
