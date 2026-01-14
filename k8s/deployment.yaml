@@ -127,7 +127,7 @@ spec:
         # ===== Liveness Probe: Pod가 살아있는지 체크 (실패 시 재시작) =====
         livenessProbe:
           httpGet:
-            path: /health        # 체크할 HTTP 경로
+            path: /auth/health   # 체크할 HTTP 경로
             port: 3000           # 체크할 포트
           initialDelaySeconds: 30  # Pod 시작 후 30초 대기 (앱 초기화 시간)
           periodSeconds: 10        # 10초마다 체크
@@ -136,7 +136,7 @@ spec:
         # ===== Readiness Probe: Pod가 트래픽 받을 준비가 됐는지 체크 (실패 시 Service에서 제외) =====
         readinessProbe:
           httpGet:
-            path: /health        # 체크할 HTTP 경로
+            path: /auth/health   # 체크할 HTTP 경로
             port: 3000           # 체크할 포트
           initialDelaySeconds: 5   # Pod 시작 후 5초 대기
           periodSeconds: 5         # 5초마다 체크
