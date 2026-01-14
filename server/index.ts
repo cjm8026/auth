@@ -48,12 +48,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Health check endpoint
-app.get('/health', (req: Request, res: Response) => {
+app.get('/auth/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
 // API routes
-app.use('/api/user', userRoutes);
+app.use('/auth/api/user', userRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
