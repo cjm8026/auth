@@ -21,7 +21,7 @@ spec:
       - name: backend                          # 컨테이너 이름
         image: 324547056370.dkr.ecr.us-east-1.amazonaws.com/fproject-dev-api:latest  # ECR 이미지 경로
         ports:
-        - containerPort: 3001  # 컨테이너가 리스닝하는 포트 (Express 서버 포트)
+        - containerPort: 3000  # 컨테이너가 리스닝하는 포트 (Express 서버 포트)
           name: http           # 포트 이름 (Service에서 참조 가능)
         # ===== 볼륨 마운트 추가 (CSI Driver가 Secret을 생성하도록 트리거) =====
         volumeMounts:
@@ -128,7 +128,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /health        # 체크할 HTTP 경로
-            port: 3001           # 체크할 포트
+            port: 3000           # 체크할 포트
           initialDelaySeconds: 30  # Pod 시작 후 30초 대기 (앱 초기화 시간)
           periodSeconds: 10        # 10초마다 체크
           timeoutSeconds: 5        # 5초 안에 응답 없으면 실패
@@ -137,7 +137,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /health        # 체크할 HTTP 경로
-            port: 3001           # 체크할 포트
+            port: 3000           # 체크할 포트
           initialDelaySeconds: 5   # Pod 시작 후 5초 대기
           periodSeconds: 5         # 5초마다 체크
           timeoutSeconds: 3        # 3초 안에 응답 없으면 실패

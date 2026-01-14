@@ -12,7 +12,7 @@ import { getDatabaseService } from '../src/services/database';
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.API_PORT || 3001;
+const PORT = process.env.API_PORT || 3000;
 
 // Initialize database connection
 const initDatabase = async () => {

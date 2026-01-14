@@ -1,0 +1,27 @@
+# Ingress: ALB를 통한 외부 트래픽 라우팅
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: fproject-backend-ingress
+  namespace: default
+  annotations:
+    # ALB Ingress Controller 설정
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/group.name: one-api-alb  # 기존 ALB에 통합
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/healthcheck-path: /health
+    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
+spec:
+  ingressClassName: alb
+  rules:
+  - host: api.aws11.shop
+    http:
+      paths:
+      - path: /auth
+        pathType: Prefix
+        backend:
+          service:
+            name: fproject-backend-service
+            port:
+              number: 80
