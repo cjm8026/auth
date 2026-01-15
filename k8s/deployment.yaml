@@ -119,11 +119,11 @@ spec:
         # ===== 리소스 제한 =====
         resources:
           requests:              # 최소 보장 리소스 (스케줄링 시 고려)
-            memory: "256Mi"      # 최소 256MB 메모리 보장
-            cpu: "250m"          # 최소 0.25 CPU 코어 보장 (1000m = 1 core)
+            memory: "128Mi"      # 최소 128MB 메모리 보장
+            cpu: "125m"          # 최소 0.125 CPU 코어 보장 (1000m = 1 core)
           limits:                # 최대 사용 가능 리소스
-            memory: "512Mi"      # 최대 512MB (초과 시 OOMKilled)
-            cpu: "500m"          # 최대 0.5 CPU 코어 (초과 시 throttling)
+            memory: "256Mi"      # 최대 256MB (초과 시 OOMKilled)
+            cpu: "250m"          # 최대 0.25 CPU 코어 (초과 시 throttling)
         # ===== Liveness Probe: Pod가 살아있는지 체크 (실패 시 재시작) =====
         livenessProbe:
           httpGet:
