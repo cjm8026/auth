@@ -1,30 +1,34 @@
-# Ingress: ALB를 통한 외부 트래픽 라우팅
+# Ingress: ALB를 자동으로 생성하고 외부 트래픽을 Service로 라우팅
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: fproject-backend-ingress
   namespace: default
   annotations:
-    # ALB Ingress Controller 설정
-    alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: ip
-    alb.ingress.kubernetes.io/group.name: one-api-alb  # 기존 ALB에 통합
-    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
-    alb.ingress.kubernetes.io/ssl-redirect: "443"
-    alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:us-east-1:324547056370:certificate/dcba4e4a-c0d5-4e97-aecc-91a1b35f7355
+    # ===== ALB Controller 설정 =====
+    alb.ingress.kubernetes.io/scheme: internet-facing  # 인터넷에서 접근 가능
+    alb.ingress.kubernetes.io/target-type: ip          # Pod IP로 직접 라우팅 (NodePort 불필요)
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'  # HTTP/HTTPS 리스너
+    
+    # ===== SSL/TLS 설정 (ACM 인증서 ARN 입력 필요) =====
+    # alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:ap-northeast-2:324547056370:certificate/YOUR-CERT-ID
+    
+    # ===== Health Check 설정 =====
     alb.ingress.kubernetes.io/healthcheck-path: /auth/health
-    alb.ingress.kubernetes.io/healthcheck-protocol: HTTP
-    alb.ingress.kubernetes.io/healthcheck-interval-seconds: "30"
-    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: "5"
-    alb.ingress.kubernetes.io/healthy-threshold-count: "2"
-    alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
+    alb.ingress.kubernetes.io/healthcheck-interval-seconds: '15'
+    alb.ingress.kubernetes.io/healthcheck-timeout-seconds: '5'
+    alb.ingress.kubernetes.io/healthy-threshold-count: '2'
+    alb.ingress.kubernetes.io/unhealthy-threshold-count: '2'
+    
+    # ===== 기타 설정 =====
+    alb.ingress.kubernetes.io/load-balancer-name: fproject-backend-alb  # ALB 이름
+    alb.ingress.kubernetes.io/tags: Environment=production,Service=backend
 spec:
-  ingressClassName: alb
+  ingressClassName: alb  # ALB Ingress Controller 사용
   rules:
-  - host: api.aws11.shop
-    http:
+  - http:
       paths:
-      - path: /auth
+      - path: /
         pathType: Prefix
         backend:
           service:
