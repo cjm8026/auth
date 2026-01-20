@@ -6,20 +6,20 @@ metadata:
   name: fproject-backend-config  # ConfigMap 이름 (Deployment에서 참조)
   namespace: default             # 배포할 네임스페이스
 data:
-  # ===== 데이터베이스 설정 (한국 리전 RDS로 변경 필요) =====
-  DB_HOST: "YOUR-KOREA-RDS-ENDPOINT.ap-northeast-2.rds.amazonaws.com"  # 한국 리전 RDS 엔드포인트
-  DB_PORT: "5432"                      # PostgreSQL 기본 포트
-  DB_NAME: "fproject_db"               # 데이터베이스 이름
-  DB_USER: "fproject_user"             # 데이터베이스 사용자명
-  DB_MAX_CONNECTIONS: "20"             # Connection Pool 최대 연결 수 (Pod 2개 × 10)
-  DB_IDLE_TIMEOUT: "30000"             # 유휴 연결 타임아웃 (30초, 밀리초 단위)
-  DB_CONNECTION_TIMEOUT: "5000"        # 연결 시도 타임아웃 (5초, 밀리초 단위)
+  # ===== 데이터베이스 설정 (한국 리전 RDS) =====
+  DB_HOST: "one-postgres.cricim2es6bi.ap-northeast-2.rds.amazonaws.com"
+  DB_PORT: "5432"
+  DB_NAME: "fproject_db"
+  DB_USER: "fproject_user"
+  DB_MAX_CONNECTIONS: "20"
+  DB_IDLE_TIMEOUT: "30000"
+  DB_CONNECTION_TIMEOUT: "5000"
   
-  # ===== AWS 서비스 설정 (한국 리전으로 변경) =====
-  AWS_REGION: "ap-northeast-2"         # AWS 리전 (서울)
-  AWS_USER_POOL_ID: "YOUR-KOREA-USER-POOL-ID"       # 한국 리전 Cognito User Pool ID
-  AWS_CLIENT_ID: "YOUR-KOREA-CLIENT-ID"             # 한국 리전 Cognito Client ID
-  S3_BUCKET: "YOUR-KOREA-S3-BUCKET"                 # 한국 리전 S3 버킷
+  # ===== AWS 서비스 설정 (한국 리전) =====
+  AWS_REGION: "ap-northeast-2"
+  AWS_USER_POOL_ID: "ap-northeast-2_mFvtIc1kQ"
+  AWS_CLIENT_ID: "3c0kds3554rvakp9piqv694at2"
+  S3_BUCKET: "YOUR-S3-BUCKET-NAME"  # S3 버킷 생성 후 입력
   
   # ===== API 서버 설정 =====
   API_PORT: "3000"                     # Express 서버가 리스닝할 포트

@@ -7,8 +7,8 @@ on:
 
 env:
   AWS_REGION: ap-northeast-2
-  ECR_REPOSITORY: fproject-dev-api
-  EKS_CLUSTER_NAME: YOUR-KOREA-EKS-CLUSTER-NAME  # 한국 리전 EKS 클러스터 이름으로 변경
+  ECR_REPOSITORY: auth-api
+  EKS_CLUSTER_NAME: one
 
 jobs:
   build-and-push:

@@ -19,7 +19,7 @@ spec:
       serviceAccountName: fproject-backend-sa  # IAM Role 연동을 위한 ServiceAccount
       containers:
       - name: backend                          # 컨테이너 이름
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/fproject-dev-api:latest  # 한국 리전 ECR 이미지 경로
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:latest  # 한국 리전 ECR 이미지 경로
         ports:
         - containerPort: 3000  # 컨테이너가 리스닝하는 포트 (Express 서버 포트)
           name: http           # 포트 이름 (Service에서 참조 가능)
@@ -106,7 +106,7 @@ spec:
             secretKeyRef:
               name: fproject-backend-secret  # Secret 이름
               key: DB_PASSWORD               # Secret의 키
-        - name: AWS_ACCESS_KEY_ID     # AWS 액세스 키 ID
+        - name: AWS_ACCESS_KEY_ID     # AWS 액세스 키 ID (S3 업로드 등에 사용)
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
