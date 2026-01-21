@@ -180,28 +180,22 @@ export class AuthService {
   }
 
   async deleteUser(userId: string, email?: string): Promise<void> {
-    const LAMBDA_URL = 'https://wyhaig5um6pijs6sjajgsymw4m0rbzso.lambda-url.us-east-1.on.aws/';
-    
     try {
-      console.log(`[AuthService.deleteUser] Deleting user from Cognito via Lambda: ${userId}`);
+      console.log(`[AuthService.deleteUser] Deleting user from Cognito: ${userId}`);
       
-      const response = await fetch(LAMBDA_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ queryType: 'cognito_delete', userId }),
+      const command = new AdminDeleteUserCommand({
+        UserPoolId: this.userPoolId,
+        Username: userId,
       });
       
-      const result = await response.json();
-      console.log('[AuthService.deleteUser] Lambda response:', result);
-      
-      if (response.ok && result.success) {
-        console.log(`[AuthService.deleteUser] Successfully deleted user from Cognito: ${userId}`);
-        return;
-      }
-      
-      throw new Error(result.message || 'Lambda invocation failed');
+      await this.cognitoClient.send(command);
+      console.log(`[AuthService.deleteUser] Successfully deleted user from Cognito: ${userId}`);
       
     } catch (error: any) {
+      if (error.name === 'UserNotFoundException') {
+        console.log(`[AuthService.deleteUser] User not found in Cognito (already deleted): ${userId}`);
+        return;
+      }
       console.error(`[AuthService.deleteUser] Failed to delete user from Cognito:`, error);
       throw new CognitoError(`Failed to delete user from Cognito: ${error.message}`, error.name);
     }
