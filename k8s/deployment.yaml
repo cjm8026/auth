@@ -1,46 +1,39 @@
-# Deployment: Podë¥??ì„±?˜ê³  ê´€ë¦¬í•˜??ë¦¬ì†Œ??
-apiVersion: apps/v1  # Kubernetes API ë²„ì „
-kind: Deployment     # ë¦¬ì†Œ???€??
+apiVersion: apps/v1
+kind: Deployment
 metadata:
-  name: fproject-backend      # Deployment ?´ë¦„
-  namespace: default          # ë°°í¬???¤ì„?¤í˜?´ìŠ¤
+  name: fproject-backend
+  namespace: default
   labels:
-    app: fproject-backend     # Deployment??ë¶™ëŠ” ?ˆì´ë¸?(ê´€ë¦¬ìš©)
+    app: fproject-backend
 spec:
-  replicas: 2                 # ?¤í–‰??Pod ê°œìˆ˜ (ê³ ê??©ì„±???„í•´ 2ê°?
+  replicas: 2
   selector:
     matchLabels:
-      app: fproject-backend   # ???ˆì´ë¸”ì„ ê°€ì§?Podë¥?ê´€ë¦?
-  template:                   # Pod ?œí”Œë¦?(?¤ì œ ?ì„±??Pod???¤ì •)
+      app: fproject-backend
+  template:
     metadata:
       labels:
-        app: fproject-backend # Pod??ë¶™ëŠ” ?ˆì´ë¸?(Serviceê°€ ?´ê±¸ë¡?ì°¾ìŒ)
+        app: fproject-backend
     spec:
-      serviceAccountName: fproject-backend-sa  # IAM Role ?°ë™???„í•œ ServiceAccount
+      serviceAccountName: fproject-backend-sa
       nodeSelector:
         karpenter.sh/nodepool: default
       containers:
-      - name: backend                          # ì»¨í…Œ?´ë„ˆ ?´ë¦„
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:e5f46870b564b8804bbb79e12a2938cd0678f4f7
-=======
-      - name: backend                          # ì»¨í…Œ?´ë„ˆ ?´ë¦„
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:e5f46870b564b8804bbb79e12a2938cd0678f4f7œêµ­ ë¦¬ì „ ECR ?´ë?ì§€ ê²½ë¡œ
->>>>>>> 26379fe (feat: Add Karpenter nodeSelector to deployment for proper node scheduling)
+      - name: backend
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:latest
         ports:
-        - containerPort: 3000  # ì»¨í…Œ?´ë„ˆê°€ ë¦¬ìŠ¤?í•˜???¬íŠ¸ (Express ?œë²„ ?¬íŠ¸)
-          name: http           # ?¬íŠ¸ ?´ë¦„ (Service?ì„œ ì°¸ì¡° ê°€??
-        # ===== ë³¼ë¥¨ ë§ˆìš´??ì¶”ê? (CSI Driverê°€ Secret???ì„±?˜ë„ë¡??¸ë¦¬ê±? =====
+        - containerPort: 3000
+          name: http
         volumeMounts:
-        - name: secrets-store-inline  # ë³¼ë¥¨ ?´ë¦„
-          mountPath: "/mnt/secrets-store"  # ë§ˆìš´??ê²½ë¡œ (?¤ì œë¡??¬ìš©?˜ì? ?Šì?ë§??„ìš”)
+        - name: secrets-store-inline
+          mountPath: "/mnt/secrets-store"
           readOnly: true
         env:
-        # ===== ConfigMap?ì„œ ê°€?¸ì˜¤???˜ê²½ë³€??(ë¹„ë?ê°??•ë³´) =====
-        - name: DB_HOST        # ?˜ê²½ë³€???´ë¦„
+        - name: DB_HOST
           valueFrom:
             configMapKeyRef:
-              name: fproject-backend-config  # ConfigMap ?´ë¦„
-              key: DB_HOST                   # ConfigMap????
+              name: fproject-backend-config
+              key: DB_HOST
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
@@ -56,104 +49,99 @@ spec:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_USER
-        - name: DB_MAX_CONNECTIONS  # Connection Pool ìµœë? ?°ê²° ??
+        - name: DB_MAX_CONNECTIONS
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_MAX_CONNECTIONS
-        - name: DB_IDLE_TIMEOUT     # ? íœ´ ?°ê²° ?€?„ì•„??(ë°€ë¦¬ì´ˆ)
+        - name: DB_IDLE_TIMEOUT
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_IDLE_TIMEOUT
-        - name: DB_CONNECTION_TIMEOUT  # ?°ê²° ?œë„ ?€?„ì•„??(ë°€ë¦¬ì´ˆ)
+        - name: DB_CONNECTION_TIMEOUT
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_CONNECTION_TIMEOUT
-        - name: AWS_REGION          # AWS ë¦¬ì „
+        - name: AWS_REGION
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_REGION
-        - name: AWS_USER_POOL_ID    # Cognito User Pool ID
+        - name: AWS_USER_POOL_ID
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_USER_POOL_ID
-        - name: AWS_CLIENT_ID       # Cognito Client ID
+        - name: AWS_CLIENT_ID
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_CLIENT_ID
-        - name: API_PORT            # API ?œë²„ ?¬íŠ¸
+        - name: API_PORT
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: API_PORT
-        - name: FRONTEND_URL        # CORS ?¤ì •???„ë¡ ?¸ì—”??URL
+        - name: FRONTEND_URL
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: FRONTEND_URL
-        - name: NODE_ENV            # Node.js ?˜ê²½ (production/development)
+        - name: NODE_ENV
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: NODE_ENV
-        - name: S3_BUCKET           # ?„ë¡œ???´ë?ì§€ ?…ë¡œ?œìš© S3 ë²„í‚·
+        - name: S3_BUCKET
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: S3_BUCKET
-        # ===== Secret?ì„œ ê°€?¸ì˜¤???˜ê²½ë³€??(ë¯¼ê° ?•ë³´) =====
-        - name: DB_PASSWORD         # ?°ì´?°ë² ?´ìŠ¤ ë¹„ë?ë²ˆí˜¸
+        - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: fproject-backend-secret  # Secret ?´ë¦„
-              key: DB_PASSWORD               # Secret????
-        - name: AWS_ACCESS_KEY_ID     # AWS ?¡ì„¸????ID (S3 ?…ë¡œ???±ì— ?¬ìš©)
+              name: fproject-backend-secret
+              key: DB_PASSWORD
+        - name: AWS_ACCESS_KEY_ID
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
               key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY # AWS ?œí¬ë¦??¡ì„¸????
+        - name: AWS_SECRET_ACCESS_KEY
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
               key: AWS_SECRET_ACCESS_KEY
-        # ===== ë¦¬ì†Œ???œí•œ =====
         resources:
-          requests:              # ìµœì†Œ ë³´ì¥ ë¦¬ì†Œ??(?¤ì?ì¤„ë§ ??ê³ ë ¤)
-            memory: "128Mi"      # ìµœì†Œ 128MB ë©”ëª¨ë¦?ë³´ì¥
-            cpu: "125m"          # ìµœì†Œ 0.125 CPU ì½”ì–´ ë³´ì¥ (1000m = 1 core)
-          limits:                # ìµœë? ?¬ìš© ê°€??ë¦¬ì†Œ??
-            memory: "256Mi"      # ìµœë? 256MB (ì´ˆê³¼ ??OOMKilled)
-            cpu: "250m"          # ìµœë? 0.25 CPU ì½”ì–´ (ì´ˆê³¼ ??throttling)
-        # ===== Liveness Probe: Podê°€ ?´ì•„?ˆëŠ”ì§€ ì²´í¬ (?¤íŒ¨ ???¬ì‹œ?? =====
+          requests:
+            memory: "128Mi"
+            cpu: "125m"
+          limits:
+            memory: "256Mi"
+            cpu: "250m"
         livenessProbe:
           httpGet:
-            path: /auth/health   # ì²´í¬??HTTP ê²½ë¡œ
-            port: 3000           # ì²´í¬???¬íŠ¸
-          initialDelaySeconds: 30  # Pod ?œì‘ ??30ì´??€ê¸?(??ì´ˆê¸°???œê°„)
-          periodSeconds: 10        # 10ì´ˆë§ˆ??ì²´í¬
-          timeoutSeconds: 5        # 5ì´??ˆì— ?‘ë‹µ ?†ìœ¼ë©??¤íŒ¨
-          failureThreshold: 3      # 3ë²??°ì† ?¤íŒ¨?˜ë©´ Pod ?¬ì‹œ??
-        # ===== Readiness Probe: Podê°€ ?¸ë˜??ë°›ì„ ì¤€ë¹„ê? ?ëŠ”ì§€ ì²´í¬ (?¤íŒ¨ ??Service?ì„œ ?œì™¸) =====
+            path: /auth/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
-            path: /auth/health   # ì²´í¬??HTTP ê²½ë¡œ
-            port: 3000           # ì²´í¬???¬íŠ¸
-          initialDelaySeconds: 5   # Pod ?œì‘ ??5ì´??€ê¸?
-          periodSeconds: 5         # 5ì´ˆë§ˆ??ì²´í¬
-          timeoutSeconds: 3        # 3ì´??ˆì— ?‘ë‹µ ?†ìœ¼ë©??¤íŒ¨
-          failureThreshold: 3      # 3ë²??°ì† ?¤íŒ¨?˜ë©´ Service?ì„œ ?œì™¸
-      restartPolicy: Always      # Pod ì¢…ë£Œ ????ƒ ?¬ì‹œ??
-      # ===== ë³¼ë¥¨ ?•ì˜ (CSI Driver ?¬ìš©) =====
+            path: /auth/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+      restartPolicy: Always
       volumes:
       - name: secrets-store-inline
         csi:
-          driver: secrets-store.csi.k8s.io  # CSI Driver ?´ë¦„
+          driver: secrets-store.csi.k8s.io
           readOnly: true
           volumeAttributes:
-            secretProviderClass: "fproject-backend-secrets"  # SecretProviderClass ?´ë¦„
+            secretProviderClass: "fproject-backend-secrets"
