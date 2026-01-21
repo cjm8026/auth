@@ -159,26 +159,65 @@ export class UserService {
         throw new UserNotFoundError(userId);
       }
 
+      // 외래 키 제약 조건 순서대로 삭제
+      // 1. library_items (user_id 참조)
+      try {
+        await client.query('DELETE FROM library_items WHERE user_id = $1', [userId]);
+        console.log('[UserService.deleteUser] library_items deleted');
+      } catch (error: any) {
+        if (error.code !== '42P01') {
+          console.error('[UserService.deleteUser] Error deleting library_items:', error);
+          throw error;
+        }
+        console.log('[UserService.deleteUser] library_items table does not exist');
+      }
+
+      // 2. journal_entries (user_id 참조)
+      try {
+        await client.query('DELETE FROM journal_entries WHERE user_id = $1', [userId]);
+        console.log('[UserService.deleteUser] journal_entries deleted');
+      } catch (error: any) {
+        if (error.code !== '42P01') {
+          console.error('[UserService.deleteUser] Error deleting journal_entries:', error);
+          throw error;
+        }
+        console.log('[UserService.deleteUser] journal_entries table does not exist');
+      }
+
+      // 3. user_reports (reporter_id, reported_user_id 참조)
       try {
         await client.query(
           'DELETE FROM user_reports WHERE reporter_id = $1 OR reported_user_id = $1',
           [userId]
         );
+        console.log('[UserService.deleteUser] user_reports deleted');
       } catch (error: any) {
-        if (error.code !== '42P01') throw error;
+        if (error.code !== '42P01') {
+          console.error('[UserService.deleteUser] Error deleting user_reports:', error);
+          throw error;
+        }
+        console.log('[UserService.deleteUser] user_reports table does not exist');
       }
 
+      // 4. user_inquiries (user_id 참조)
       try {
-        await client.query(
-          'DELETE FROM user_inquiries WHERE user_id = $1',
-          [userId]
-        );
+        await client.query('DELETE FROM user_inquiries WHERE user_id = $1', [userId]);
+        console.log('[UserService.deleteUser] user_inquiries deleted');
       } catch (error: any) {
-        if (error.code !== '42P01') throw error;
+        if (error.code !== '42P01') {
+          console.error('[UserService.deleteUser] Error deleting user_inquiries:', error);
+          throw error;
+        }
+        console.log('[UserService.deleteUser] user_inquiries table does not exist');
       }
 
+      // 5. user_profiles (user_id 참조)
       await client.query('DELETE FROM user_profiles WHERE user_id = $1', [userId]);
+      console.log('[UserService.deleteUser] user_profiles deleted');
+
+      // 6. users (마지막)
       await client.query('DELETE FROM users WHERE user_id = $1', [userId]);
+      console.log('[UserService.deleteUser] users deleted');
       
       console.log('[UserService.deleteUser] Deletion completed successfully');
     });
