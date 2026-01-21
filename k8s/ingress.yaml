@@ -5,9 +5,9 @@ metadata:
   name: auth-api-ingress
   namespace: default
   annotations:
-    # ===== ALB Controller 설정 =====
+    # ===== ALB Controller 설정 (DR 환경) =====
     kubernetes.io/ingress.class: alb
-    alb.ingress.kubernetes.io/group.name: one-api-alb  # 다른 API들과 같은 ALB 사용
+    alb.ingress.kubernetes.io/group.name: one-dr-api-alb  # DR ALB 그룹 사용
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/healthcheck-path: /auth/health

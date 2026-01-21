@@ -7,7 +7,7 @@ metadata:
   labels:
     app: fproject-backend     # Deployment에 붙는 레이블
 spec:
-  replicas: 2                 # 실행할 Pod 개수
+  replicas: 1                 # DR 환경: 평소 1개, Failover 시 Lambda가 4개로 증가
   selector:
     matchLabels:
       app: fproject-backend   # 이 레이블을 가진 Pod를 관리
