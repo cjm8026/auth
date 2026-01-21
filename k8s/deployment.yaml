@@ -20,7 +20,7 @@ spec:
         karpenter.sh/nodepool: default
       containers:
       - name: backend
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:latest
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:4fcb4c37cdde77b8f990a84703ae30b8b7644661
         ports:
         - containerPort: 3000
           name: http
