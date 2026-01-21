@@ -7,7 +7,7 @@ metadata:
   namespace: default             # 배포할 네임스페이스
 data:
   # ===== 데이터베이스 설정 (한국 리전 RDS - DR Read Replica) =====
-  DB_HOST: "one-dr-postgres-replica.cricim2es6bi.ap-northeast-2.rds.amazonaws.com"
+  DB_HOST: "one-dr-replica.cricim2es6bi.ap-northeast-2.rds.amazonaws.com"
   DB_PORT: "5432"
   DB_NAME: "onedb"
   DB_USER: "oneuser"
