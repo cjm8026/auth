@@ -1,40 +1,46 @@
-# Deployment: Pod를 생성하고 관리하는 리소스
+# Deployment: Pod�??�성?�고 관리하??리소??
 apiVersion: apps/v1  # Kubernetes API 버전
-kind: Deployment     # 리소스 타입
+kind: Deployment     # 리소???�??
 metadata:
-  name: fproject-backend      # Deployment 이름
-  namespace: default          # 배포할 네임스페이스
+  name: fproject-backend      # Deployment ?�름
+  namespace: default          # 배포???�임?�페?�스
   labels:
-    app: fproject-backend     # Deployment에 붙는 레이블 (관리용)
+    app: fproject-backend     # Deployment??붙는 ?�이�?(관리용)
 spec:
-  replicas: 2                 # 실행할 Pod 개수 (고가용성을 위해 2개)
+  replicas: 2                 # ?�행??Pod 개수 (고�??�성???�해 2�?
   selector:
     matchLabels:
-      app: fproject-backend   # 이 레이블을 가진 Pod를 관리
-  template:                   # Pod 템플릿 (실제 생성될 Pod의 설정)
+      app: fproject-backend   # ???�이블을 가�?Pod�?관�?
+  template:                   # Pod ?�플�?(?�제 ?�성??Pod???�정)
     metadata:
       labels:
-        app: fproject-backend # Pod에 붙는 레이블 (Service가 이걸로 찾음)
+        app: fproject-backend # Pod??붙는 ?�이�?(Service가 ?�걸�?찾음)
     spec:
-      serviceAccountName: fproject-backend-sa  # IAM Role 연동을 위한 ServiceAccount
+      serviceAccountName: fproject-backend-sa  # IAM Role ?�동???�한 ServiceAccount
+      nodeSelector:
+        karpenter.sh/nodepool: default
       containers:
-      - name: backend                          # 컨테이너 이름
+      - name: backend                          # 컨테?�너 ?�름
         image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:7f9e212d5931422d536379c68eb819be17197abe
+=======
+      - name: backend                          # 컨테?�너 ?�름
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:latest  # ?�국 리전 ECR ?��?지 경로
+>>>>>>> 26379fe (feat: Add Karpenter nodeSelector to deployment for proper node scheduling)
         ports:
-        - containerPort: 3000  # 컨테이너가 리스닝하는 포트 (Express 서버 포트)
-          name: http           # 포트 이름 (Service에서 참조 가능)
-        # ===== 볼륨 마운트 추가 (CSI Driver가 Secret을 생성하도록 트리거) =====
+        - containerPort: 3000  # 컨테?�너가 리스?�하???�트 (Express ?�버 ?�트)
+          name: http           # ?�트 ?�름 (Service?�서 참조 가??
+        # ===== 볼륨 마운??추�? (CSI Driver가 Secret???�성?�도�??�리�? =====
         volumeMounts:
-        - name: secrets-store-inline  # 볼륨 이름
-          mountPath: "/mnt/secrets-store"  # 마운트 경로 (실제로 사용하지 않지만 필요)
+        - name: secrets-store-inline  # 볼륨 ?�름
+          mountPath: "/mnt/secrets-store"  # 마운??경로 (?�제�??�용?��? ?��?�??�요)
           readOnly: true
         env:
-        # ===== ConfigMap에서 가져오는 환경변수 (비민감 정보) =====
-        - name: DB_HOST        # 환경변수 이름
+        # ===== ConfigMap?�서 가?�오???�경변??(비�?�??�보) =====
+        - name: DB_HOST        # ?�경변???�름
           valueFrom:
             configMapKeyRef:
-              name: fproject-backend-config  # ConfigMap 이름
-              key: DB_HOST                   # ConfigMap의 키
+              name: fproject-backend-config  # ConfigMap ?�름
+              key: DB_HOST                   # ConfigMap????
         - name: DB_PORT
           valueFrom:
             configMapKeyRef:
@@ -50,17 +56,17 @@ spec:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_USER
-        - name: DB_MAX_CONNECTIONS  # Connection Pool 최대 연결 수
+        - name: DB_MAX_CONNECTIONS  # Connection Pool 최�? ?�결 ??
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_MAX_CONNECTIONS
-        - name: DB_IDLE_TIMEOUT     # 유휴 연결 타임아웃 (밀리초)
+        - name: DB_IDLE_TIMEOUT     # ?�휴 ?�결 ?�?�아??(밀리초)
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: DB_IDLE_TIMEOUT
-        - name: DB_CONNECTION_TIMEOUT  # 연결 시도 타임아웃 (밀리초)
+        - name: DB_CONNECTION_TIMEOUT  # ?�결 ?�도 ?�?�아??(밀리초)
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
@@ -80,74 +86,74 @@ spec:
             configMapKeyRef:
               name: fproject-backend-config
               key: AWS_CLIENT_ID
-        - name: API_PORT            # API 서버 포트
+        - name: API_PORT            # API ?�버 ?�트
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: API_PORT
-        - name: FRONTEND_URL        # CORS 설정용 프론트엔드 URL
+        - name: FRONTEND_URL        # CORS ?�정???�론?�엔??URL
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: FRONTEND_URL
-        - name: NODE_ENV            # Node.js 환경 (production/development)
+        - name: NODE_ENV            # Node.js ?�경 (production/development)
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: NODE_ENV
-        - name: S3_BUCKET           # 프로필 이미지 업로드용 S3 버킷
+        - name: S3_BUCKET           # ?�로???��?지 ?�로?�용 S3 버킷
           valueFrom:
             configMapKeyRef:
               name: fproject-backend-config
               key: S3_BUCKET
-        # ===== Secret에서 가져오는 환경변수 (민감 정보) =====
-        - name: DB_PASSWORD         # 데이터베이스 비밀번호
+        # ===== Secret?�서 가?�오???�경변??(민감 ?�보) =====
+        - name: DB_PASSWORD         # ?�이?�베?�스 비�?번호
           valueFrom:
             secretKeyRef:
-              name: fproject-backend-secret  # Secret 이름
-              key: DB_PASSWORD               # Secret의 키
-        - name: AWS_ACCESS_KEY_ID     # AWS 액세스 키 ID (S3 업로드 등에 사용)
+              name: fproject-backend-secret  # Secret ?�름
+              key: DB_PASSWORD               # Secret????
+        - name: AWS_ACCESS_KEY_ID     # AWS ?�세????ID (S3 ?�로???�에 ?�용)
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
               key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY # AWS 시크릿 액세스 키
+        - name: AWS_SECRET_ACCESS_KEY # AWS ?�크�??�세????
           valueFrom:
             secretKeyRef:
               name: fproject-backend-secret
               key: AWS_SECRET_ACCESS_KEY
-        # ===== 리소스 제한 =====
+        # ===== 리소???�한 =====
         resources:
-          requests:              # 최소 보장 리소스 (스케줄링 시 고려)
-            memory: "128Mi"      # 최소 128MB 메모리 보장
+          requests:              # 최소 보장 리소??(?��?줄링 ??고려)
+            memory: "128Mi"      # 최소 128MB 메모�?보장
             cpu: "125m"          # 최소 0.125 CPU 코어 보장 (1000m = 1 core)
-          limits:                # 최대 사용 가능 리소스
-            memory: "256Mi"      # 최대 256MB (초과 시 OOMKilled)
-            cpu: "250m"          # 최대 0.25 CPU 코어 (초과 시 throttling)
-        # ===== Liveness Probe: Pod가 살아있는지 체크 (실패 시 재시작) =====
+          limits:                # 최�? ?�용 가??리소??
+            memory: "256Mi"      # 최�? 256MB (초과 ??OOMKilled)
+            cpu: "250m"          # 최�? 0.25 CPU 코어 (초과 ??throttling)
+        # ===== Liveness Probe: Pod가 ?�아?�는지 체크 (?�패 ???�시?? =====
         livenessProbe:
           httpGet:
-            path: /auth/health   # 체크할 HTTP 경로
-            port: 3000           # 체크할 포트
-          initialDelaySeconds: 30  # Pod 시작 후 30초 대기 (앱 초기화 시간)
-          periodSeconds: 10        # 10초마다 체크
-          timeoutSeconds: 5        # 5초 안에 응답 없으면 실패
-          failureThreshold: 3      # 3번 연속 실패하면 Pod 재시작
-        # ===== Readiness Probe: Pod가 트래픽 받을 준비가 됐는지 체크 (실패 시 Service에서 제외) =====
+            path: /auth/health   # 체크??HTTP 경로
+            port: 3000           # 체크???�트
+          initialDelaySeconds: 30  # Pod ?�작 ??30�??��?(??초기???�간)
+          periodSeconds: 10        # 10초마??체크
+          timeoutSeconds: 5        # 5�??�에 ?�답 ?�으�??�패
+          failureThreshold: 3      # 3�??�속 ?�패?�면 Pod ?�시??
+        # ===== Readiness Probe: Pod가 ?�래??받을 준비�? ?�는지 체크 (?�패 ??Service?�서 ?�외) =====
         readinessProbe:
           httpGet:
-            path: /auth/health   # 체크할 HTTP 경로
-            port: 3000           # 체크할 포트
-          initialDelaySeconds: 5   # Pod 시작 후 5초 대기
-          periodSeconds: 5         # 5초마다 체크
-          timeoutSeconds: 3        # 3초 안에 응답 없으면 실패
-          failureThreshold: 3      # 3번 연속 실패하면 Service에서 제외
-      restartPolicy: Always      # Pod 종료 시 항상 재시작
-      # ===== 볼륨 정의 (CSI Driver 사용) =====
+            path: /auth/health   # 체크??HTTP 경로
+            port: 3000           # 체크???�트
+          initialDelaySeconds: 5   # Pod ?�작 ??5�??��?
+          periodSeconds: 5         # 5초마??체크
+          timeoutSeconds: 3        # 3�??�에 ?�답 ?�으�??�패
+          failureThreshold: 3      # 3�??�속 ?�패?�면 Service?�서 ?�외
+      restartPolicy: Always      # Pod 종료 ????�� ?�시??
+      # ===== 볼륨 ?�의 (CSI Driver ?�용) =====
       volumes:
       - name: secrets-store-inline
         csi:
-          driver: secrets-store.csi.k8s.io  # CSI Driver 이름
+          driver: secrets-store.csi.k8s.io  # CSI Driver ?�름
           readOnly: true
           volumeAttributes:
-            secretProviderClass: "fproject-backend-secrets"  # SecretProviderClass 이름
+            secretProviderClass: "fproject-backend-secrets"  # SecretProviderClass ?�름
