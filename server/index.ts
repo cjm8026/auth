@@ -55,6 +55,9 @@ app.get('/auth/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Explicit OPTIONS handler for CORS preflight
+app.options('*', cors());
+
 // API routes
 app.use('/auth/user', userRoutes);
 
