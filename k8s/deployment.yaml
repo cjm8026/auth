@@ -25,10 +25,6 @@ spec:
         ports:
         - containerPort: 3000 # Express 서버 포트
           name: http
-        volumeMounts:
-        - name: secrets-store-inline
-          mountPath: "/mnt/secrets-store"
-          readOnly: true
         env:
         - name: DB_HOST
           valueFrom:
@@ -139,10 +135,3 @@ spec:
           timeoutSeconds: 3
           failureThreshold: 3
       restartPolicy: Always
-      volumes:
-      - name: secrets-store-inline
-        csi:
-          driver: secrets-store.csi.k8s.io
-          readOnly: true
-          volumeAttributes:
-            secretProviderClass: "fproject-backend-secrets"
