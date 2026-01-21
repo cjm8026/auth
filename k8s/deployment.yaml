@@ -21,10 +21,10 @@ spec:
         karpenter.sh/nodepool: default
       containers:
       - name: backend                          # 컨테?�너 ?�름
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:e7d287d0d08a5b82145d6a3a872fa0704197c41e
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:e5f46870b564b8804bbb79e12a2938cd0678f4f7
 =======
       - name: backend                          # 컨테?�너 ?�름
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:e7d287d0d08a5b82145d6a3a872fa0704197c41e�국 리전 ECR ?��?지 경로
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:e5f46870b564b8804bbb79e12a2938cd0678f4f7�국 리전 ECR ?��?지 경로
 >>>>>>> 26379fe (feat: Add Karpenter nodeSelector to deployment for proper node scheduling)
         ports:
         - containerPort: 3000  # 컨테?�너가 리스?�하???�트 (Express ?�버 ?�트)
