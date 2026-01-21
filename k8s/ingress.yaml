@@ -6,6 +6,7 @@ metadata:
   namespace: default
   annotations:
     # ===== ALB Controller 설정 =====
+    kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/group.name: one-api-alb  # 다른 API들과 같은 ALB 사용
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
@@ -15,7 +16,6 @@ metadata:
     alb.ingress.kubernetes.io/healthy-threshold-count: "2"
     alb.ingress.kubernetes.io/unhealthy-threshold-count: "2"
 spec:
-  ingressClassName: alb
   rules:
   - host: api.aws11.shop
     http:
