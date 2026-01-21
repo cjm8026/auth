@@ -19,7 +19,7 @@ data:
   AWS_REGION: "ap-northeast-2"
   AWS_USER_POOL_ID: "ap-northeast-2_mFvtIc1kQ"
   AWS_CLIENT_ID: "3c0kds3554rvakp9piqv694at2"
-  S3_BUCKET: "YOUR-S3-BUCKET-NAME"  # S3 버킷 생성 후 입력
+  S3_BUCKET: "fproject-s3-1234567"  # 프로필 이미지 업로드용 S3 버킷
   
   # ===== API 서버 설정 =====
   API_PORT: "3000"                     # Express 서버가 리스닝할 포트
