@@ -39,6 +39,8 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
 }));
 
 app.use(express.json({ limit: '10mb' }));
@@ -54,9 +56,6 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.get('/auth/health', (req: Request, res: Response) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
-
-// Explicit OPTIONS handler for CORS preflight
-app.options('*', cors());
 
 // API routes
 app.use('/auth/user', userRoutes);
