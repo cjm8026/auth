@@ -159,12 +159,16 @@ export class UserService {
         throw new UserNotFoundError(userId);
       }
 
-      // 외래 키 제약 조건 순서대로 삭제
+      // 외래 키 제약 조건 순서대로 삭제 (각각 savepoint 사용)
+      
       // 1. library_items (user_id 참조)
+      await client.query('SAVEPOINT sp1');
       try {
         await client.query('DELETE FROM library_items WHERE user_id = $1', [userId]);
+        await client.query('RELEASE SAVEPOINT sp1');
         console.log('[UserService.deleteUser] library_items deleted');
       } catch (error: any) {
+        await client.query('ROLLBACK TO SAVEPOINT sp1');
         if (error.code !== '42P01') {
           console.error('[UserService.deleteUser] Error deleting library_items:', error);
           throw error;
@@ -173,10 +177,13 @@ export class UserService {
       }
 
       // 2. journal_entries (user_id 참조)
+      await client.query('SAVEPOINT sp2');
       try {
         await client.query('DELETE FROM journal_entries WHERE user_id = $1', [userId]);
+        await client.query('RELEASE SAVEPOINT sp2');
         console.log('[UserService.deleteUser] journal_entries deleted');
       } catch (error: any) {
+        await client.query('ROLLBACK TO SAVEPOINT sp2');
         if (error.code !== '42P01') {
           console.error('[UserService.deleteUser] Error deleting journal_entries:', error);
           throw error;
@@ -185,13 +192,16 @@ export class UserService {
       }
 
       // 3. user_reports (reporter_id, reported_user_id 참조)
+      await client.query('SAVEPOINT sp3');
       try {
         await client.query(
           'DELETE FROM user_reports WHERE reporter_id = $1 OR reported_user_id = $1',
           [userId]
         );
+        await client.query('RELEASE SAVEPOINT sp3');
         console.log('[UserService.deleteUser] user_reports deleted');
       } catch (error: any) {
+        await client.query('ROLLBACK TO SAVEPOINT sp3');
         if (error.code !== '42P01') {
           console.error('[UserService.deleteUser] Error deleting user_reports:', error);
           throw error;
@@ -200,10 +210,13 @@ export class UserService {
       }
 
       // 4. user_inquiries (user_id 참조)
+      await client.query('SAVEPOINT sp4');
       try {
         await client.query('DELETE FROM user_inquiries WHERE user_id = $1', [userId]);
+        await client.query('RELEASE SAVEPOINT sp4');
         console.log('[UserService.deleteUser] user_inquiries deleted');
       } catch (error: any) {
+        await client.query('ROLLBACK TO SAVEPOINT sp4');
         if (error.code !== '42P01') {
           console.error('[UserService.deleteUser] Error deleting user_inquiries:', error);
           throw error;
