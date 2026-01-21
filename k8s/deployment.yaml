@@ -21,7 +21,7 @@ spec:
         karpenter.sh/nodepool: default
       containers:
       - name: backend         # 컨테이너 이름
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:cf4aeea4f0a05e1c3fea19a89354158d18f09eb7
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:2e68341a809abf81699940f007af2227155ddd3d
         ports:
         - containerPort: 3000 # Express 서버 포트
           name: http
