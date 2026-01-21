@@ -21,14 +21,10 @@ spec:
         karpenter.sh/nodepool: default
       containers:
       - name: backend         # 컨테이너 이름
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:892698c71cef454773410c9c4702ead4ee779f5a
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:442a164dba50b8bdbd9f1d579052b897dee711cc
         ports:
         - containerPort: 3000 # Express 서버 포트
           name: http
-        volumeMounts:
-        - name: secrets-store-inline
-          mountPath: "/mnt/secrets-store"
-          readOnly: true
         env:
         - name: DB_HOST
           valueFrom:
@@ -139,10 +135,3 @@ spec:
           timeoutSeconds: 3
           failureThreshold: 3
       restartPolicy: Always
-      volumes:
-      - name: secrets-store-inline
-        csi:
-          driver: secrets-store.csi.k8s.io
-          readOnly: true
-          volumeAttributes:
-            secretProviderClass: "fproject-backend-secrets"

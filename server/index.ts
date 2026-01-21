@@ -33,6 +33,7 @@ app.use(cors({
     'http://localhost:8080',
     'http://localhost:5174',
     'https://www.aws11.shop',
+    'https://web.aws11.shop',
     'https://api.aws11.shop',
   ],
   credentials: true,

@@ -21,8 +21,11 @@ data:
   AWS_CLIENT_ID: "3c0kds3554rvakp9piqv694at2"
   S3_BUCKET: "fproject-s3-1234567"  # 프로필 이미지 업로드용 S3 버킷
   
+  # ===== Google OAuth 설정 =====
+  GOOGLE_CLIENT_ID: "209232492194-eqeun8aun1f6v1gsen0bu60q34j0ilgk.apps.googleusercontent.com"
+  
   # ===== API 서버 설정 =====
   API_PORT: "3000"                     # Express 서버가 리스닝할 포트
-  FRONTEND_URL: "https://www.aws11.shop"  # CORS 허용 도메인 (프론트엔드 URL)
+  FRONTEND_URL: "https://www.aws11.shop,https://web.aws11.shop"  # CORS 허용 도메인 (프론트엔드 URL)
   NODE_ENV: "production"               # Node.js 환경 (production/development)
                                        # production: 에러 스택 숨김, 로깅 최소화, 성능 최적화
