@@ -19,7 +19,7 @@ spec:
       serviceAccountName: fproject-backend-sa  # IAM Role 연동용 ServiceAccount
       containers:
       - name: backend         # 컨테이너 이름
-        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:dr-300b1ba686ef3c8ba665e5b14a76746eadbeb7b5
+        image: 324547056370.dkr.ecr.ap-northeast-2.amazonaws.com/auth-api:dr-d91f8d7b5ac946c946d354c0466d5cd75b7e7c83
         ports:
         - containerPort: 3000 # Express 서버 포트
           name: http
