@@ -2,13 +2,13 @@ name: Deploy to Korea DR Region
 
 on:
   push:
-    branches: [dr]  # DR branch에서만 트리거
+    branches: [dr]
   workflow_dispatch:
 
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: auth-api
-  EKS_CLUSTER_NAME: one-dr  # DR 클러스터
+  EKS_CLUSTER_NAME: one-dr
 
 jobs:
   build-and-push:
@@ -40,7 +40,7 @@ jobs:
         id: build-image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          IMAGE_TAG: dr-${{ github.sha }}  # DR 태그
+          IMAGE_TAG: dr-${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -81,7 +81,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
-          ref: dr  # DR branch 체크아웃
+          ref: dr
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -103,7 +103,6 @@ jobs:
       - name: Deploy to DR EKS
         run: |
           kubectl apply -f k8s/configmap.yaml
-          kubectl apply -f k8s/secret-provider-class.yaml
           kubectl apply -f k8s/serviceaccount.yaml
           kubectl apply -f k8s/service.yaml
           kubectl apply -f k8s/deployment.yaml
@@ -115,21 +114,21 @@ jobs:
 
       - name: Verify deployment
         run: |
-          echo "📊 Deployment Status:"
+          echo " Deployment Status:"
           kubectl get pods -n default -l app=fproject-backend
           echo ""
-          echo "📊 Service Status:"
+          echo " Service Status:"
           kubectl get svc -n default -l app=fproject-backend
           echo ""
-          echo "📊 Ingress Status:"
+          echo " Ingress Status:"
           kubectl get ingress -n default
 
       - name: Deployment Summary
         run: |
-          echo "✅ DR Deployment Complete!"
-          echo "🔵 Image: ${{ needs.build-and-push.outputs.image-uri }}"
-          echo "🏷️ Tag: ${{ needs.build-and-push.outputs.image-tag }}"
-          echo "🌐 Cluster: ${{ env.EKS_CLUSTER_NAME }}"
+          echo " DR Deployment Complete!"
+          echo " Image: ${{ needs.build-and-push.outputs.image-uri }}"
+          echo " Tag: ${{ needs.build-and-push.outputs.image-tag }}"
+          echo " Cluster: ${{ env.EKS_CLUSTER_NAME }}"
 
   notify:
     name: Deployment Notification
@@ -140,17 +139,18 @@ jobs:
     steps:
       - name: Deployment Summary
         run: |
-          echo "🚀 DR CI/CD Pipeline Summary"
+          echo " DR CI/CD Pipeline Summary"
           echo "===================="
           echo "Branch: ${{ github.ref_name }}"
           echo "Commit: ${{ github.sha }}"
           echo "Author: ${{ github.actor }}"
           echo ""
-          echo "📦 Build & Push: ${{ needs.build-and-push.result }}"
-          echo "🚢 Deploy to EKS: ${{ needs.deploy-to-eks.result }}"
+          echo " Build & Push: ${{ needs.build-and-push.result }}"
+          echo " Deploy to EKS: ${{ needs.deploy-to-eks.result }}"
           echo ""
           if [ "${{ needs.deploy-to-eks.result }}" == "success" ]; then
-            echo "✅ DR deployment successful!"
+            echo " DR deployment successful!"
           else
-            echo "❌ DR deployment failed!"
+            echo " DR deployment failed!"
           fi
+
