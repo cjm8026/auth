@@ -7,7 +7,7 @@ metadata:
   labels:
     app: fproject-backend     # Deployment에 붙는 레이블
 spec:
-  replicas: 3                 # DR 환경: Failover 테스트를 위해 3개로 증가
+  replicas: 1                 # DR 환경: 평상시 1개 유지 (Failover 시 3개로 증가)
   selector:
     matchLabels:
       app: fproject-backend   # 이 레이블을 가진 Pod를 관리
