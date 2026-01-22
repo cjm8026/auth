@@ -5,11 +5,11 @@ metadata:
   name: fproject-backend-service  # Service 이름 (DNS로 사용됨)
   namespace: default              # 배포할 네임스페이스
   labels:
-    app: fproject-backend         # Service에 붙는 레이블 (관리용)
+    app: fproject-backend         # Service에 붙는 레이블(관리용)
 spec:
   type: ClusterIP    # Service 타입 - ALB가 클러스터 내부에서 직접 라우팅
   ports:
-  - port: 80         # Service가 리스닝하는 포트
+  - port: 8000       # Service가 리스닝하는 포트
     targetPort: 3000 # Pod의 컨테이너 포트 (Express 기본 포트)
     protocol: TCP    # 프로토콜 (TCP/UDP)
     name: http       # 포트 이름
