@@ -96,6 +96,15 @@ spec:
             configMapKeyRef:
               name: fproject-backend-config
               key: S3_BUCKET
+        # OpenTelemetry 환경변수
+        - name: OTEL_SERVICE_NAME
+          value: "auth-service"
+        - name: OTEL_EXPORTER_OTLP_ENDPOINT
+          value: "http://jaeger-collector.istio-system.svc.cluster.local:4317"
+        - name: APP_VERSION
+          value: "1.0.0"
+        - name: ENV
+          value: "production"
         - name: DB_PASSWORD
           valueFrom:
             secretKeyRef:

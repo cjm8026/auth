@@ -2,6 +2,12 @@
  * Express API Server - Main entry point
  */
 
+// OpenTelemetry must be imported FIRST before any other imports
+import { setupTracing } from '../src/tracing';
+
+// Initialize tracing before anything else
+setupTracing();
+
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
