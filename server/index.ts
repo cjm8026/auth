@@ -3,10 +3,8 @@
  */
 
 // OpenTelemetry must be imported FIRST before any other imports
-import { setupTracing } from '../src/tracing';
-
-// Initialize tracing before anything else
-setupTracing();
+// tracing.ts는 import만 해도 자동으로 초기화됨
+import '../src/tracing';
 
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
