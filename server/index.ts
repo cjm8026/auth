@@ -56,9 +56,16 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Health check endpoint
-app.get('/auth/health', (req: Request, res: Response) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+// Health check endpoint (with DB query for load testing)
+app.get('/auth/health', async (req: Request, res: Response) => {
+  try {
+    // Simple DB query to generate load
+    const db = getDatabaseService();
+    await db.query('SELECT 1');
+    res.json({ status: 'ok', timestamp: new Date().toISOString(), db: 'connected' });
+  } catch (error) {
+    res.status(503).json({ status: 'error', timestamp: new Date().toISOString(), db: 'disconnected' });
+  }
 });
 
 // API routes
